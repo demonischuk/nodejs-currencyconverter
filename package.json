@@ -1,0 +1,19 @@
+{
+  "name": "currencyrate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node bin/currency",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "currency": "./bin/currency.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^7.0.0",
+    "node-fetch": "^2.6.0"
+  }
+}
