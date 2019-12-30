@@ -5,5 +5,5 @@ Make it available to execute anywhere by typing `npm link` in the root directory
 You can then type `currency` to execute the application
 
 ## Future plans
-* Handle the Api being down
-* Unit tests
+* Allow chooseing the starting currency
+* Unit test the command line argument route
