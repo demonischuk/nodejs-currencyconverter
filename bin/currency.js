@@ -3,34 +3,11 @@
 const fetch = require("node-fetch");
 const inquirer = require("inquirer");
 
-inquirer.prompt([{
-    type: "input",
-    name: "currency",
-    message: "Currency to convert to",
-    default: "EUR",
-    validate: (value) => {
-        if (new RegExp("^[a-zA-Z]{3}$").test(value)) {
-            return true;
-        }
+const validate = require("../lib/validation");
 
-        return "Please enter a valid 3 letter currency";
-    }
-},
-{
-    type: "input",
-    name: "amount",
-    message: "Amount to convert",
-    validate: (value) => {
-        if (isNaN(value)) {
-            return "Please enter a valid amount";
-        }
-
-        return true;
-    }
-}])
-.then(answers => {
-    const currency = answers.currency.toUpperCase();
-    const convertAmount = parseFloat(answers.amount);
+const perform = (currency, amount) => {
+    currency = currency.toUpperCase();
+    convertAmount = parseFloat(amount);
     
     fetch("https://api.exchangeratesapi.io/latest?base=GBP")
         .then(response => response.json())
@@ -47,4 +24,51 @@ inquirer.prompt([{
                 console.log(`£${convertAmount} into ${currency} is ${(data.rates[currency] * convertAmount).toFixed(2)}`);
             }
         });
-});
+};
+
+const performViaCommandArgs = () => {
+    if (process.argv.length != 4) {
+        console.log("Expected a 3 letter currency code an an amount to be specified");
+        return;
+    }
+
+    const currency = process.argv[2];
+    const amount = parseFloat(process.argv[3]);
+
+    const currencyValidation = validate.currency(currency);
+    const amountValidation = validate.amount(amount);
+
+    if (currencyValidation === true && amountValidation === true) {
+        perform(currency, amount);
+        return;
+    }
+    
+    if (typeof currencyValidation === "string") {
+        console.log(currencyValidation);
+    }
+
+    if (typeof amountValidation === "string") {
+        console.log(amountValidation);
+    } 
+};
+
+const performViaPrompts = () => {
+    inquirer.prompt([{
+        type: "input",
+        name: "currency",
+        message: "Currency to convert to",
+        default: "EUR",
+        validate: validate.currency
+    },
+    {
+        type: "input",
+        name: "amount",
+        message: "Amount to convert",
+        validate: validate.amount
+    }])
+    .then(answers => {
+        perform(answers.currency, answers.amount);        
+    });
+};
+
+process.argv.length > 2 ? performViaCommandArgs() : performViaPrompts();
