@@ -1,28 +1,18 @@
 #! /usr/bin/env node
-
-const fetch = require("node-fetch");
 const inquirer = require("inquirer");
 
+const ratesApi = require("../lib/ratesApi");
 const validate = require("../lib/validation");
 
+const conversionService = require("../lib/conversionService")(ratesApi);
+
 const perform = (currency, amount) => {
-    currency = currency.toUpperCase();
-    convertAmount = parseFloat(amount);
-    
-    fetch("https://api.exchangeratesapi.io/latest?base=GBP")
-        .then(response => response.json())
-        .then(data => {
-            if (typeof data.rates[currency] === "undefined") {
-                let possible = [];
-    
-                for (c in data.rates) {
-                    possible.push(c);
-                }
-    
-                console.log(`Unknown currency "${currency}. Possible options are: ${possible.join(", ")}`);
-            } else {
-                console.log(`£${convertAmount} into ${currency} is ${(data.rates[currency] * convertAmount).toFixed(2)}`);
-            }
+    conversionService.convert(currency, amount)
+        .then(successMessage => {
+            console.log(successMessage);
+        })
+        .catch(e => {
+            console.log(`${e.code}: ${e.message}`);
         });
 };
 
@@ -42,14 +32,14 @@ const performViaCommandArgs = () => {
         perform(currency, amount);
         return;
     }
-    
+
     if (typeof currencyValidation === "string") {
         console.log(currencyValidation);
     }
 
     if (typeof amountValidation === "string") {
         console.log(amountValidation);
-    } 
+    }
 };
 
 const performViaPrompts = () => {
@@ -66,9 +56,9 @@ const performViaPrompts = () => {
         message: "Amount to convert",
         validate: validate.amount
     }])
-    .then(answers => {
-        perform(answers.currency, answers.amount);        
-    });
+        .then(answers => {
+            perform(answers.currency, answers.amount);
+        });
 };
 
 process.argv.length > 2 ? performViaCommandArgs() : performViaPrompts();
