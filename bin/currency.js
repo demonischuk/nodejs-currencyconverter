@@ -8,8 +8,8 @@ const conversionService = require("../lib/conversionService")(ratesApi);
 
 const perform = (currency, amount) => {
     conversionService.convert(currency, amount)
-        .then(successMessage => {
-            console.log(successMessage);
+        .then(convertedAmount => {
+            console.log(`£${amount} into ${currency.toUpperCase()} is ${convertedAmount.toFixed()}`);
         })
         .catch(e => {
             console.log(`${e.code}: ${e.message}`);
