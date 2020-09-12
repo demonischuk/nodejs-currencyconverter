@@ -16,6 +16,6 @@
     "commander": "^4.0.1",
     "inquirer": "^7.0.0",
     "jest": "^24.9.0",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.1"
   }
 }
